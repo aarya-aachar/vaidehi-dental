@@ -469,7 +469,7 @@
 
 
 
-					<div class="container">
+					<div class="container" style="display: none;">
 						<div class="header">
 							<div class="logo">
 								<span class="logo-icon">+</span>
@@ -630,7 +630,7 @@
 					</div>
 
 
-					<div style="display: none;">
+					<div class="container" >
 						<div class="header">
 							<div class="logo">
 								<span class="logo-icon">+</span>
