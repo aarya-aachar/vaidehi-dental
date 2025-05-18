@@ -1,0 +1,523 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ page import="com.dentalClinic.model.Appointment"%>
+<%@ page import="com.dentalClinic.service.DoctorService"%>
+<%@ page import="com.dentalClinic.service.AdminService"%>
+
+
+<%@ page import="com.dentalClinic.model.Doctor"%>
+<%@ page import="java.util.List"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Appointments - Vaidehi Dental</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/styles/global.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+body {
+	margin: 0;
+	font-family: "Poppins", sans-serif;
+	background-color: #f5f6fa;
+}
+
+.portal-container {
+	display: flex;
+	min-height: 100vh;
+}
+
+/* Sidebar styles */
+.sidebar {
+	width: 250px;
+	background-color: #2c3e50;
+	color: white;
+	position: fixed;
+	height: 100%;
+	overflow-y: auto;
+}
+
+.sidebar-header {
+	padding: 20px;
+	text-align: center;
+	border-bottom: 1px solid #3c546c;
+}
+
+.sidebar-user {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20px 0;
+}
+
+.user-avatar {
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	background-color: #4299e1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 10px;
+	font-size: 32px;
+	color: white;
+}
+
+.user-name {
+	font-weight: 600;
+	margin-bottom: 5px;
+}
+
+.user-email {
+	font-size: 12px;
+	color: #cbd5e0;
+}
+
+.sidebar-nav {
+	padding: 0;
+	list-style-type: none;
+}
+
+.sidebar-nav li {
+	padding: 0;
+}
+
+.sidebar-nav li a {
+	display: flex;
+	align-items: center;
+	padding: 15px 20px;
+	color: #cbd5e0;
+	text-decoration: none;
+	transition: all 0.3s;
+}
+
+.sidebar-nav li a i {
+	margin-right: 10px;
+	width: 20px;
+	text-align: center;
+}
+
+.sidebar-nav li a:hover, .sidebar-nav li.active a {
+	background-color: #34495e;
+	color: white;
+}
+
+.sidebar-nav li.active a {
+	border-left: 4px solid #4299e1;
+}
+
+.logout-link {
+	margin-top: 30px;
+	border-top: 1px solid #3c546c;
+}
+
+/* Main content styles */
+.main-content {
+	flex: 1;
+	margin-left: 250px;
+	padding: 20px;
+}
+
+.page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.page-title {
+	font-size: 24px;
+	font-weight: 600;
+	color: #2d3748;
+}
+
+.appointments-container {
+	background-color: white;
+	border-radius: 8px;
+	padding: 20px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-navigation {
+	display: flex;
+	border-bottom: 1px solid #e2e8f0;
+	margin-bottom: 20px;
+}
+
+.tab-button {
+	padding: 10px 20px;
+	margin-right: 10px;
+	background: none;
+	border: none;
+	border-bottom: 3px solid transparent;
+	font-weight: 500;
+	color: #718096;
+	cursor: pointer;
+}
+
+.tab-button.active {
+	color: #4299e1;
+	border-bottom-color: #4299e1;
+}
+
+.tab-content {
+	display: none;
+}
+
+.tab-content.active {
+	display: block;
+}
+
+.appointments-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.appointments-table th {
+	text-align: left;
+	padding: 12px 15px;
+	border-bottom: 1px solid #e2e8f0;
+	color: #718096;
+	font-weight: 500;
+}
+
+.appointments-table td {
+	padding: 12px 15px;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+.appointments-table tr:last-child td {
+	border-bottom: none;
+}
+
+.appointment-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.appointment-action {
+	background: none;
+	border: none;
+	font-size: 14px;
+	color: #4299e1;
+	cursor: pointer;
+	padding: 5px;
+}
+
+.appointment-action.cancel {
+	color: #e53e3e;
+}
+
+.appointment-action.reschedule {
+	color: #ed8936;
+}
+
+.appointment-action.view {
+	color: #4299e1;
+}
+
+.status-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.status-confirmed {
+	background-color: #c6f6d5;
+	color: #22543d;
+}
+
+.status-pending {
+	background-color: #feebc8;
+	color: #744210;
+}
+
+.status-cancelled {
+	background-color: #fed7d7;
+	color: #822727;
+}
+
+.status-completed {
+	background-color: #e2e8f0;
+	color: #2d3748;
+}
+
+.empty-state {
+	text-align: center;
+	padding: 30px;
+	color: #718096;
+}
+
+.empty-state i {
+	font-size: 48px;
+	margin-bottom: 15px;
+	color: #cbd5e0;
+}
+
+.empty-state-title {
+	font-size: 18px;
+	font-weight: 600;
+	margin-bottom: 10px;
+}
+
+.empty-state-message {
+	margin-bottom: 20px;
+}
+
+.book-now-btn {
+	display: inline-block;
+	padding: 10px 20px;
+	background-color: #4299e1;
+	color: white;
+	border-radius: 5px;
+	text-decoration: none;
+	font-weight: 500;
+	transition: background-color 0.3s;
+}
+
+.book-now-btn:hover {
+	background-color: #3182ce;
+}
+
+/* Mobile responsiveness */
+@media ( max-width : 768px) {
+	.portal-container {
+		flex-direction: column;
+	}
+	.sidebar {
+		width: 100%;
+		height: auto;
+		position: relative;
+	}
+	.main-content {
+		margin-left: 0;
+	}
+	.appointments-table {
+		display: block;
+		overflow-x: auto;
+	}
+}
+</style>
+</head>
+
+<body>
+	<div class="portal-container">
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<div class="sidebar-header">
+				<h3>Vaidehi Dental</h3>
+			</div>
+
+			<div class="sidebar-user">
+				<img
+					src="${pageContext.request.contextPath}/images/<%=request.getAttribute("profile_image")%>"
+					width="100" height="100"
+					style="border-radius: 50%; object-fit: cover; aspect-ratio: 1; margin-bottom:10px" />
+				<div class="user-name"><%=request.getAttribute("first_name")%>
+					<%=request.getAttribute("last_name")%>
+				</div>
+				<div class="user-email"><%=request.getAttribute("email")%></div>
+			</div>
+
+			<ul class="sidebar-nav">
+				<li><a href="/dentalClinic/patient"> <i class="fas fa-home"></i>
+						Dashboard
+				</a></li>
+				<li class="active"><a href="/dentalClinic/patient/appointments">
+						<i class="fas fa-calendar-alt"></i> My Appointments
+				</a></li>
+				<li><a href="/dentalClinic/patient/appointments/new"> <i
+						class="fas fa-plus-circle"></i> Book Appointment
+				</a></li>
+				<li class=""><a href="/dentalClinic/patient/testimonial"> <i
+                        class="fas fa-comment-medical"></i> Give Testimonial
+                </a></li>
+				<li><a href="/dentalClinic/patient/profile"> <i
+						class="fas fa-user-circle"></i> My Profile
+				</a></li>
+
+				<li class="logout-link"><a href="/dentalClinic/logout"> <i
+						class="fas fa-sign-out-alt"></i> Logout
+				</a></li>
+			</ul>
+		</div>
+
+		<!-- Main Content -->
+		<div class="main-content">
+			<div class="page-header">
+				<h1 class="page-title">My Appointments</h1>
+				<a href="/dentalClinic/patient/appointments/new"
+					class="book-now-btn"> <i class="fas fa-plus"></i> Book New
+					Appointment
+				</a>
+			</div>
+
+			<div class="appointments-container">
+				<!-- Upcoming Appointments Tab -->
+				<div class="tab-content active" id="upcoming-tab">
+					<table class="appointments-table">
+						<thead>
+							<tr>
+								<th>Date and Time</th>
+								<th>Doctor</th>
+
+
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<%
+							List<Appointment> appointments = (List<Appointment>) request.getAttribute("appointments");
+							if (appointments != null) {
+								for (Appointment appointment : appointments) {
+									Doctor doctor = DoctorService.getDoctorById(appointment.getDoctorId());
+							%>
+							<tr>
+								<td><%=appointment.getAppointmentDate()%> - <%=appointment.getAppointmentTime()%></td>
+								<td>Dr. <%=doctor.getFirstName()%> <%=doctor.getLastName()%></td>
+
+								<td>
+									<div class="appointment-actions">
+										
+										<form method="post"
+											action="${pageContext.request.contextPath}/patient/appointments">
+											<input type="hidden" name="action" value="update"> <input
+												type="hidden" name="appointmentId"
+												value="<%=appointment.getAppointmentId()%>">
+											<button type="submit" class="appointment-action" >
+												<i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit Appointment
+											</button>
+										</form>
+										
+										<form method="post"
+											action="${pageContext.request.contextPath}/patient/appointments">
+											<input type="hidden" name="action" value="delete"> <input
+												type="hidden" name="appointmentId"
+												value="<%=appointment.getAppointmentId()%>">
+											<button type="submit" class="appointment-action cancel"
+												onclick="return confirm('Are you sure you want to cancel this appointment?');">
+												<i class="fas fa-times-circle"></i> Cancel
+											</button>
+										</form>
+									</div>
+								</td>
+							</tr>
+							<%
+							}
+							}
+							%>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Tab navigation
+        const tabButtons = document.querySelectorAll(".tab-button");
+        const tabContents = document.querySelectorAll(".tab-content");
+
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            // Remove active class from all buttons and contents
+            tabButtons.forEach((btn) => btn.classList.remove("active"));
+            tabContents.forEach((content) =>
+              content.classList.remove("active")
+            );
+
+            // Add active class to clicked button
+            this.classList.add("active");
+
+            // Show corresponding tab content
+            const tabId = this.getAttribute("data-tab") + "-tab";
+            document.getElementById(tabId).classList.add("active");
+          });
+        });
+
+        // Handle appointment actions
+        const rescheduleButtons = document.querySelectorAll(
+          ".appointment-action.reschedule"
+        );
+        rescheduleButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const row = this.closest("tr");
+            const date = row.cells[0].textContent;
+            const doctor = row.cells[1].textContent;
+
+            // For demo purposes, we'll just show an alert
+            alert(
+              `You're about to reschedule your appointment with ${doctor} on ${date}`
+            );
+            window.location.href = "/dentalClinic/patient/appointments/new";
+          });
+        });
+
+        const cancelButtons = document.querySelectorAll(
+          ".appointment-action.cancel"
+        );
+        cancelButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const row = this.closest("tr");
+            const date = row.cells[0].textContent;
+            const doctor = row.cells[1].textContent;
+
+            if (
+              confirm(
+                `Are you sure you want to cancel your appointment with ${doctor} on ${date}?`
+              )
+            ) {
+              // For demo purposes, we'll just remove the row and add to cancelled tab
+              const cancelledTab = document.getElementById("cancelled-tab");
+              const tbody = cancelledTab.querySelector("tbody");
+
+              // Create a new row for the cancelled tab
+              const newRow = document.createElement("tr");
+              newRow.innerHTML = `
+                <td>${date}</td>
+                <td>${doctor}</td>
+                <td>${row.cells[2].textContent}</td>
+                <td><span class="status-badge status-cancelled">Cancelled</span></td>
+                <td>
+                  <div class="appointment-actions">
+                    <button class="appointment-action view">
+                      <i class="fas fa-eye"></i> View Details
+                    </button>
+                  </div>
+                </td>
+              `;
+
+              tbody.appendChild(newRow);
+              row.remove();
+              alert("Appointment cancelled successfully!");
+            }
+          });
+        });
+
+        const viewButtons = document.querySelectorAll(
+          ".appointment-action.view"
+        );
+        viewButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const row = this.closest("tr");
+            const date = row.cells[0].textContent;
+            const doctor = row.cells[1].textContent;
+            const service = row.cells[2].textContent;
+
+            // For demo purposes, we'll just show an alert
+            alert(
+              `Appointment Details:\nDate: ${date}\nDoctor: ${doctor}\nService: ${service}`
+            );
+          });
+        });
+      });
+    </script> -->
+</body>
+</html>

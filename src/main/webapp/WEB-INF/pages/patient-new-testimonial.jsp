@@ -1,0 +1,361 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Give Testimonial - Vaidehi Dental</title>
+<link rel="stylesheet"
+    href="${pageContext.request.contextPath}/styles/global.css" />
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background-color: #f5f6fa;
+}
+
+.portal-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar styles */
+.sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    position: fixed;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #3c546c;
+}
+
+.sidebar-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #4299e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    font-size: 32px;
+    color: white;
+}
+
+.user-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #cbd5e0;
+}
+
+.sidebar-nav {
+    padding: 0;
+    list-style-type: none;
+}
+
+.sidebar-nav li {
+    padding: 0;
+}
+
+.sidebar-nav li a {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: #cbd5e0;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.sidebar-nav li a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-nav li a:hover, .sidebar-nav li.active a {
+    background-color: #34495e;
+    color: white;
+}
+
+.sidebar-nav li.active a {
+    border-left: 4px solid #4299e1;
+}
+
+.logout-link {
+    margin-top: 30px;
+    border-top: 1px solid #3c546c;
+}
+
+/* Main content styles */
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+/* Testimonial form styles */
+.testimonial-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-section {
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 250px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: #4299e1;
+    outline: none;
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.rating-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stars {
+    display: flex;
+    gap: 5px;
+}
+
+.star {
+    color: #e2e8f0;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star.selected {
+    color: #fbbf24;
+}
+
+.form-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-cancel {
+    background-color: white;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-cancel:hover {
+    background-color: #f7fafc;
+}
+
+.btn-primary {
+    background-color: #4299e1;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #3182ce;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .portal-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+    .form-group {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+    <div class="portal-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Vaidehi Dental</h3>
+            </div>
+
+            <div class="sidebar-user">
+                <img
+                    src="${pageContext.request.contextPath}/images/<%=request.getAttribute("profile_image")%>"
+                    width="100" height="100"
+                    style="border-radius: 50%; object-fit: cover; aspect-ratio: 1; margin-bottom:10px" />
+                <div class="user-name"><%=request.getAttribute("first_name")%>
+                    <%=request.getAttribute("last_name")%>
+                </div>
+                <div class="user-email"><%=request.getAttribute("email")%></div>
+            </div>
+
+            <ul class="sidebar-nav">
+                <li><a href="/dentalClinic/patient"> <i class="fas fa-home"></i>
+                        Dashboard
+                </a></li>
+                <li><a href="/dentalClinic/patient/appointments"> <i
+                        class="fas fa-calendar-alt"></i> My Appointments
+                </a></li>
+                <li><a href="/dentalClinic/patient/appointments/new"> <i
+                        class="fas fa-plus-circle"></i> Book Appointment
+                </a></li>
+                <li class="active"><a href="/dentalClinic/patient/testimonial"> <i
+                        class="fas fa-comment-medical"></i> Give Testimonial
+                </a></li>
+                <li><a href="/dentalClinic/patient/profile"> <i
+                        class="fas fa-user-circle"></i> My Profile
+                </a></li>
+
+                <li class="logout-link"><a href="/dentalClinic/logout"> <i
+                        class="fas fa-sign-out-alt"></i> Logout
+                </a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Share Your Experience</h1>
+            </div>
+
+            <div class="testimonial-container">
+                <form id="testimonialForm" action="${pageContext.request.contextPath}/patient/testimonial/submit"
+                    method="post">
+                    <div class="form-section">
+                        <h3 class="section-title">Your Feedback</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Rating</label>
+                                <select class="form-control" id="rating" name="rating" required>
+                                    <option value="">Select your rating</option>
+                                    <option value="5">5 Stars - Excellent</option>
+                                    <option value="4">4 Stars - Very Good</option>
+                                    <option value="3">3 Stars - Good</option>
+                                    <option value="2">2 Stars - Fair</option>
+                                    <option value="1">1 Star - Poor</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Your Testimonial</label>
+                                <textarea class="form-control" name="feedback" id="feedback"
+                                    placeholder="Share your experience with our dental clinic..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Testimonial</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add any JavaScript you need here
+        document.querySelector('.btn-cancel').addEventListener('click', function() {
+            window.location.href = '/dentalClinic/patient';
+        });
+    </script>
+</body>
+</html>
