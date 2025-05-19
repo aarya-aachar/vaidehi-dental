@@ -26,7 +26,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 /**
  * Servlet implementation class RegisterServlet
  */
-@WebServlet("/register")
+@WebServlet("/user-register")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, 
 		maxFileSize = 1024 * 1024 * 10, // 4 MB
 		maxRequestSize = 1024 * 1024 * 50) // 20 MB
