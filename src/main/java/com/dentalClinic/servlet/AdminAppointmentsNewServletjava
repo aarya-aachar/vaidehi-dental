@@ -1,0 +1,96 @@
+package com.dentalClinic.servlet;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
+import com.dentalClinic.config.DatabaseConfig.DatabaseConnectionException;
+import com.dentalClinic.model.Appointment;
+import com.dentalClinic.service.AdminService;
+
+/**
+ * Servlet implementation class AdminDashboardServlet
+ */
+@WebServlet("/admin/appointments")
+public class AdminAppointmentsServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public AdminAppointmentsServlet() {
+        super();
+       
+       
+
+
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        try {
+           
+           
+
+
+            List<Appointment> appointments = AdminService.getAllAppointments();
+            request.setAttribute("appointments", appointments);
+        } catch (SQLException | DatabaseConnectionException e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Error fetching appointments");
+        }
+        request.getRequestDispatcher("/WEB-INF/pages/admin-appointments.jsp").forward(request, response);
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
+        
+        if ("delete".equalsIgnoreCase(action)) {
+            doDelete(request, response);
+        } else {
+           
+           
+
+           
+            doGet(request, response);
+        }
+    }
+
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        String appointmentIdStr = request.getParameter("appointmentId");
+        
+        try {
+            if (appointmentIdStr == null || appointmentIdStr.isEmpty()) {
+                request.setAttribute("errorMessage", "Appointment ID is required");
+                doGet(request, response);
+                return;
+            }
+            
+            int appointmentId = Integer.parseInt(appointmentIdStr);
+            boolean isDeleted = AdminService.deleteAppointment(appointmentId);
+            
+            if (isDeleted) {
+                request.setAttribute("successMessage", "Appointment deleted successfully");
+            } else {
+                request.setAttribute("errorMessage", "Appointment not found or could not be deleted");
+            }
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Invalid Appointment ID");
+        } catch (SQLException | DatabaseConnectionException e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Database error while deleting appointment");
+        }
+        
+        doGet(request, response);
+    }
+}
